@@ -19,6 +19,11 @@ namespace Epide
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (DataBox.ProfileAvailability)
+            {
+                dataBox.ReadProfile();
+            }
+            // dataBox.ReadProfile();
             CodeBox.FontFamily = new FontFamily(dataBox.EditorFont);
             CodeBox.FontSize = dataBox.FontSize;
             // TextRange textRange = new TextRange(CodeBox.Document.ContentStart, CodeBox.Document.ContentEnd);

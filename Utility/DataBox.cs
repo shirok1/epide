@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Windows.Controls;
 using HandyControl.Controls;
@@ -38,8 +39,8 @@ namespace Epide.Utility
             set
             {
                 _editorFont = value;
-                CodeBox.FontFamily = new System.Windows.Media.FontFamily(value);
-                MessageBox.Show(value);
+                CodeBox.FontFamily = new System.Windows.Media.FontFamily(_editorFont);
+                // MessageBox.Show(value);
             }
         }
         private string _editorFont = "Consolas";
@@ -63,7 +64,37 @@ namespace Epide.Utility
         [Newtonsoft.Json.JsonIgnore] public InterpreterSystem SystemInterpreter { get; }
         [Newtonsoft.Json.JsonIgnore] public InterpreterCustom CustomInterpreter { get; }
 
-        public void ReadProfile(string path = @"Settings.json")
+        private const string ProfilePath = "Settings.json";
+
+        public static bool ProfileAvailability
+        {
+            get
+            {
+                if (!File.Exists(ProfilePath))
+                {
+                    // MessageBox.Show("Profile NOT exist!");
+                    return false;
+                }
+
+                try
+                {
+                    var profileReader = new StreamReader(ProfilePath, Encoding.UTF8);
+                    string json = profileReader.ReadToEnd();
+                    profileReader.Close();
+                    // return Newtonsoft.Json.JsonConvert.DeserializeObject<DataBox>(json);
+                    var format = new { EditorFont = "", FontSize = (short)0, TabWidth = (short)0 };
+                    var toReturn = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, format);
+                }
+                catch (Newtonsoft.Json.JsonException)
+                {
+                    MessageBox.Show("Profile failed. Using default settings instead.","Profile Error");
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        public void ReadProfile(string path = ProfilePath)
         {
             var profileReader = new StreamReader(path, Encoding.UTF8);
             string json = profileReader.ReadToEnd();
@@ -76,7 +107,7 @@ namespace Epide.Utility
             TabWidth = toReturn.TabWidth;
         }
 
-        public void WriteProfile(string path = @"Settings.json")
+        public void WriteProfile(string path = ProfilePath)
         {
             using (System.IO.StreamWriter file = System.IO.File.CreateText(path))
             {
