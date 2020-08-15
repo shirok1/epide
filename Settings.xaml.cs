@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Epide.Utility;
@@ -115,7 +116,7 @@ namespace Epide
             MainDataBox?.CustomInterpreter.SetInterpreterPath(TBoxPathOfCustomPythonExe.Text);
         }
 
-        private void CBoxFontFamily_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CBoxFontFamily_OnDropDownClosed(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CBoxFontFamily.Text))
             {

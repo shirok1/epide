@@ -14,8 +14,8 @@ namespace Epide.Utility
         {
             CodeBox = codeBox;
         }
-        
-        public DataBox()
+
+        private DataBox()
         {
             BundledInterpreter = new InterpreterBundled();
             SystemInterpreter = new InterpreterSystem();
@@ -27,9 +27,9 @@ namespace Epide.Utility
             else
                 Interpreter = CustomInterpreter;
         }
-        
+
         [Newtonsoft.Json.JsonIgnore] public string ScriptPath { get; set; } = "untitled.py";
-        
+
         [Newtonsoft.Json.JsonIgnore] public RichTextBox CodeBox { get; set; }
 
         public string EditorFont
@@ -38,10 +38,12 @@ namespace Epide.Utility
             set
             {
                 _editorFont = value;
-                CodeBox.FontFamily = new System.Windows.Media.FontFamily(_editorFont);
+                CodeBox.FontFamily = new System.Windows.Media.FontFamily(value);
+                MessageBox.Show(value);
             }
         }
         private string _editorFont = "Consolas";
+
         public short TabWidth { get; set; } = 2;
 
         public short FontSize
@@ -60,19 +62,21 @@ namespace Epide.Utility
         [Newtonsoft.Json.JsonIgnore] public InterpreterBundled BundledInterpreter { get; }
         [Newtonsoft.Json.JsonIgnore] public InterpreterSystem SystemInterpreter { get; }
         [Newtonsoft.Json.JsonIgnore] public InterpreterCustom CustomInterpreter { get; }
-        public static void ReadProfile(DataBox targetDataBox, string path = @"settings.json")
+
+        public static void ReadProfile(DataBox targetDataBox, string path = @"Settings.json")
         {
             var profileReader = new StreamReader(path, Encoding.UTF8);
             string json = profileReader.ReadToEnd();
             profileReader.Close();
             // return Newtonsoft.Json.JsonConvert.DeserializeObject<DataBox>(json);
-            var format = new { EditorFont = "", FontSize = (short)0,TabWidth = (short)0 };
+            var format = new { EditorFont = "", FontSize = (short)0, TabWidth = (short)0 };
             var toReturn = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, format);
             targetDataBox.EditorFont = toReturn.EditorFont;
             targetDataBox.FontSize = toReturn.FontSize;
             targetDataBox.TabWidth = toReturn.TabWidth;
         }
-        public void WriteProfile(string path = @"settings.json")
+
+        public void WriteProfile(string path = @"Settings.json")
         {
             using (System.IO.StreamWriter file = System.IO.File.CreateText(path))
             {

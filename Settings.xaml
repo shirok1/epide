@@ -46,7 +46,8 @@
                         </Grid.ColumnDefinitions>
                         <Label Content="Font family: " Grid.Column="0" HorizontalAlignment="Left"
                                VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" />
-                        <ComboBox x:Name="CBoxFontFamily" SelectionChanged="CBoxFontFamily_OnSelectionChanged"
+                        <ComboBox x:Name="CBoxFontFamily" 
+                                  DropDownClosed="CBoxFontFamily_OnDropDownClosed"
                                   Grid.Column="1" VerticalAlignment="Top" />
                         <Label Content="Font size: " HorizontalAlignment="Right"
                                VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" Grid.Column="2" />
