@@ -63,7 +63,7 @@ namespace Epide.Utility
         [Newtonsoft.Json.JsonIgnore] public InterpreterSystem SystemInterpreter { get; }
         [Newtonsoft.Json.JsonIgnore] public InterpreterCustom CustomInterpreter { get; }
 
-        public static void ReadProfile(DataBox targetDataBox, string path = @"Settings.json")
+        public void ReadProfile(string path = @"Settings.json")
         {
             var profileReader = new StreamReader(path, Encoding.UTF8);
             string json = profileReader.ReadToEnd();
@@ -71,9 +71,9 @@ namespace Epide.Utility
             // return Newtonsoft.Json.JsonConvert.DeserializeObject<DataBox>(json);
             var format = new { EditorFont = "", FontSize = (short)0, TabWidth = (short)0 };
             var toReturn = Newtonsoft.Json.JsonConvert.DeserializeAnonymousType(json, format);
-            targetDataBox.EditorFont = toReturn.EditorFont;
-            targetDataBox.FontSize = toReturn.FontSize;
-            targetDataBox.TabWidth = toReturn.TabWidth;
+            EditorFont = toReturn.EditorFont;
+            FontSize = toReturn.FontSize;
+            TabWidth = toReturn.TabWidth;
         }
 
         public void WriteProfile(string path = @"Settings.json")

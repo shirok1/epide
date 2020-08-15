@@ -147,7 +147,7 @@ namespace Epide
             MainDataBox.EditorFont = editorFont;
             MainDataBox.FontSize = fontSize;
             MainDataBox.TabWidth = tabWidth;*/
-            DataBox.ReadProfile(MainDataBox);
+            MainDataBox.ReadProfile();
             ReloadValue();
             LoadCBoxFontFamily();
         }
