@@ -2,20 +2,18 @@
 {
     public class InterpreterBundled : InterpreterBase
     {
+        private string _interpreterPath;
+
         public override string InterpreterPath
         {
             get
             {
-                if (_interpreterPath is null)
-                {
-                    _interpreterPath = DetectBundledPython.Detect();
-                }
+                if (_interpreterPath is null) _interpreterPath = DetectBundledPython.Detect();
 
                 return _interpreterPath;
             }
         }
 
-        private string _interpreterPath = null;
         public override bool Availability => DetectBundledPython.Detect() != null && base.Availability;
     }
 }

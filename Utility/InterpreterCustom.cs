@@ -2,8 +2,12 @@
 {
     public class InterpreterCustom : InterpreterBase
     {
-        public override string InterpreterPath => _interpreterPath;
         private string _interpreterPath = "python.exe";
-        public void SetInterpreterPath(string path){_interpreterPath = path;}
+        public override string InterpreterPath => _interpreterPath;
+
+        public void SetInterpreterPath(string path)
+        {
+            _interpreterPath = path;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using Epide.Utility;
+using HandyControl.Data;
 using Microsoft.Win32;
 
 namespace Epide
@@ -11,30 +12,30 @@ namespace Epide
     /// </summary>
     public partial class Settings
     {
-        private readonly DataBox _mainDataBox;
+        public readonly DataBox MainDataBox;
 
         public Settings(DataBox extData)
         {
             InitializeComponent();
-            _mainDataBox = extData;
+            MainDataBox = extData;
         }
-
-        private void Settings_OnLoaded(object sender, RoutedEventArgs e)
+        
+        public void ReloadValue()
         {
-            foreach (var font in Fonts.SystemFontFamilies) CBoxFontFamily.Items.Add(font.Source);
-            if (_mainDataBox.BundledInterpreter.Availability)
+            // CBoxFontFamily.Items.
+            if (MainDataBox.BundledInterpreter.Availability)
             {
                 RButtonInterpreterBundled.IsEnabled = true;
-                LabelPythonVersionBundled.Content = _mainDataBox.BundledInterpreter.Version;
+                LabelPythonVersionBundled.Content = MainDataBox.BundledInterpreter.Version;
             }
 
-            if (_mainDataBox.SystemInterpreter.Availability)
+            if (MainDataBox.SystemInterpreter.Availability)
             {
                 RButtonInterpreterSystem.IsEnabled = true;
-                LabelPythonVersionSystem.Content = _mainDataBox.SystemInterpreter.Version;
+                LabelPythonVersionSystem.Content = MainDataBox.SystemInterpreter.Version;
             }
-            
-            switch (_mainDataBox.Interpreter)
+
+            switch (MainDataBox.Interpreter)
             {
                 case InterpreterBundled _:
                     RButtonInterpreterBundled.IsChecked = true;
@@ -44,10 +45,32 @@ namespace Epide
                     break;
                 default:
                     RButtonInterpreterCustom.IsChecked = true;
-                    LabelPythonVersionCustom.Content = _mainDataBox.CustomInterpreter.Version;
+                    LabelPythonVersionCustom.Content = MainDataBox.CustomInterpreter.Version;
                     break;
             }
-            TBoxPathOfCustomPythonExe.Text = _mainDataBox.CustomInterpreter.InterpreterPath;
+
+            TBoxPathOfCustomPythonExe.Text = MainDataBox.CustomInterpreter.InterpreterPath;
+            NudTabWidth.Value = MainDataBox.TabWidth;
+            NudFontSize.Value = MainDataBox.FontSize;
+        }
+        
+        private void LoadCBoxFontFamily(string fontName = "")
+        {
+            if (string.IsNullOrEmpty(fontName))
+            {
+                fontName = MainDataBox.EditorFont;
+            }
+            CBoxFontFamily.Items.Clear();
+            CBoxFontFamily.Items.Add(fontName);
+            CBoxFontFamily.SelectedIndex = 0;
+            foreach (var font in Fonts.SystemFontFamilies) CBoxFontFamily.Items.Add(font.Source);
+        }
+
+        private void Settings_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            LoadCBoxFontFamily();
+            ReloadValue();
+            // CBoxFontFamily.SelectionBoxItem
         }
 
         private void ButtonBrowsePythonExe_Click(object sender, RoutedEventArgs e)
@@ -59,37 +82,73 @@ namespace Epide
                 FileName = string.Empty,
                 FilterIndex = 1,
                 Multiselect = false,
-                RestoreDirectory = true
-                // DefaultExt = "py"
+                RestoreDirectory = true,
+                DefaultExt = "py"
             };
             if (openFileDialog.ShowDialog() == false) return;
-
             TBoxPathOfCustomPythonExe.Text = openFileDialog.FileName;
-            _mainDataBox.CustomInterpreter.SetInterpreterPath(openFileDialog.FileName); 
+            MainDataBox.CustomInterpreter.SetInterpreterPath(openFileDialog.FileName);
             LabelPythonVersionCustom.Content = DetectPythonVersion.Detect(openFileDialog.FileName);
 
-            _mainDataBox.Interpreter = _mainDataBox.CustomInterpreter;
+            MainDataBox.Interpreter = MainDataBox.CustomInterpreter;
+            // MainDataBox.CustomInterpreter;
             RButtonInterpreterCustom.IsChecked = true;
         }
 
         private void RButtonInterpreterBundled_Click(object sender, RoutedEventArgs e)
         {
-            _mainDataBox.Interpreter = _mainDataBox.BundledInterpreter;
+            MainDataBox.Interpreter = MainDataBox.BundledInterpreter;
         }
 
         private void RButtonInterpreterSystem_Click(object sender, RoutedEventArgs e)
         {
-            _mainDataBox.Interpreter = _mainDataBox.SystemInterpreter;
+            MainDataBox.Interpreter = MainDataBox.SystemInterpreter;
         }
 
         private void RButtonInterpreterCustom_Click(object sender, RoutedEventArgs e)
         {
-            _mainDataBox.Interpreter = _mainDataBox.CustomInterpreter;
+            MainDataBox.Interpreter = MainDataBox.CustomInterpreter;
         }
 
         private void TBoxPathOfCustomPythonExe_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            _mainDataBox?.CustomInterpreter.SetInterpreterPath(TBoxPathOfCustomPythonExe.Text);
+            MainDataBox?.CustomInterpreter.SetInterpreterPath(TBoxPathOfCustomPythonExe.Text);
+        }
+
+        private void CBoxFontFamily_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(CBoxFontFamily.Text))
+            {
+                return;
+            }
+            MainDataBox.EditorFont = CBoxFontFamily.Text;
+            // MainDataBox.CodeBox.FontFamily = new FontFamily(CBoxFontFamily.Text);
+        }
+
+        private void NudTabWidth_OnValueChanged(object sender, FunctionEventArgs<double> e)
+        {
+            MainDataBox.TabWidth = (short) NudTabWidth.Value;
+        }
+
+        private void NudFontSize_OnValueChanged(object sender, FunctionEventArgs<double> e)
+        {
+            MainDataBox.FontSize = (short) NudFontSize.Value;
+            // MainDataBox.CodeBox.FontSize = MainDataBox.FontSize;
+        }
+
+        private void ButtonSaveProfile(object sender, RoutedEventArgs e)
+        {
+            MainDataBox.WriteProfile();
+        }
+        private void ButtonLoadProfile(object sender, RoutedEventArgs e)
+        {
+            /*DataBox.ReadProfile(out string editorFont,out short fontSize,out short tabWidth);
+            MainDataBox.EditorFont = editorFont;
+            MainDataBox.FontSize = fontSize;
+            MainDataBox.TabWidth = tabWidth;*/
+            DataBox.ReadProfile(MainDataBox);
+            ReloadValue();
+            LoadCBoxFontFamily();
         }
     }
 }

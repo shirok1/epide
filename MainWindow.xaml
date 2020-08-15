@@ -8,8 +8,8 @@
                  xmlns:utility="clr-namespace:Epide.Utility"
                  xmlns:controls="clr-namespace:HandyControl.Controls;assembly=HandyControl"
                  mc:Ignorable="d"
-
-                 Title="Epide" Height="400" Width="400" Background="White">
+                 Loaded="MainWindow_OnLoaded"
+                 Title="Epide" Height="400" Width="400" Background="White" MinWidth="327">
     <!-- <controls:Window.Resources> -->
     <!--     <Storyboard x:Key="OnLoaded1"/> -->
     <!-- </controls:Window.Resources> -->
@@ -25,18 +25,18 @@
     <!-- </controls:Window.NonClientAreaContent> -->
     <Grid Margin="0,0,0,0">
         <Button x:Name="ButtonOpen" Content="Open" Click="ButtonOpen_Click" Style="{StaticResource ButtonPrimary}"
-                HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="5,0,0,0" />
-        <Button x:Name="ButtonSave" Content="Save" Click="ButtonSave_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75"
-                Margin="85,0,0,0" />
-        <Label x:Name="LabelStatistic" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="165,6,0,0"
-               BorderBrush="{x:Null}" Background="{x:Null}" />
+                HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="5,0,0,0" Panel.ZIndex="1" />
+        <Button x:Name="ButtonSave" Content="Save" Click="ButtonSave_Click" HorizontalAlignment="Left"
+                VerticalAlignment="Top" Width="75" Margin="85,0,0,0" Panel.ZIndex="1" />
+        <!-- <Label x:Name="LabelStatistic" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="165,6,0,0" -->
+        <!--        BorderBrush="{x:Null}" Background="{x:Null}" /> -->
         <Button x:Name="ButtonSettings" Click="ButtonSettings_Click" Content="Settings" HorizontalAlignment="Right"
                 Margin="0,0,85,0"
                 VerticalAlignment="Top" Width="75" />
         <Button x:Name="ButtonRun" Click="ButtonRun_Click" Content="Run" Style="{StaticResource ButtonSuccess}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top" Width="75" Margin="0,0,5,0" />
-        <RichTextBox x:Name="CodeBox" Margin="5,35,5,5" FontFamily="JetBrains Mono" FontSize="14" Block.LineHeight="6">
+        <RichTextBox x:Name="CodeBox" KeyDown="CodeBox_OnKeyDown" PreviewKeyDown="CodeBox_OnPreviewKeyDown" HorizontalScrollBarVisibility="Visible" Margin="5,35,5,5" Block.LineHeight="6">
             <!-- <RichTextBox.BindingGroup> -->
             <!--     <BindingGroup /> -->
             <!-- </RichTextBox.BindingGroup> -->

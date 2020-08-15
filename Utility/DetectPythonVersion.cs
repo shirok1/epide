@@ -9,10 +9,7 @@ namespace Epide.Utility
 
         internal static string Detect(string path, bool messageBox = true)
         {
-            if (path is null)
-            {
-                return "N/A";
-            }
+            if (path is null) return "N/A";
 
             var rawOutput = "";
             try
@@ -22,9 +19,7 @@ namespace Epide.Utility
             catch (Executer.ExecuteExcption)
             {
                 if (messageBox)
-                {
                     MessageBox.Show($"Error occur when trying executing {path}.", "Version detection error");
-                }
 
                 return "N/A";
             }
@@ -32,9 +27,7 @@ namespace Epide.Utility
             if (Regex.IsMatch(rawOutput, VersionInfoPattern))
                 return Regex.Match(rawOutput, VersionInfoPattern).Groups[1].Value;
             if (messageBox)
-            {
                 MessageBox.Show($"{path} might not be a proper Python interpreter.", "Version detection error");
-            }
 
             return "N/A";
         }
