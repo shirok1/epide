@@ -31,6 +31,7 @@ namespace Epide
                 {
                     Title = dataBox?.FileName;
                 }
+
                 _unsaved = value;
             }
         }
@@ -43,6 +44,7 @@ namespace Epide
             {
                 dataBox.ReadProfile();
             }
+
             // dataBox.ReadProfile();
             CodeBox.FontFamily = new FontFamily(dataBox.EditorFont);
             CodeBox.FontSize = dataBox.FontSize;
@@ -87,7 +89,6 @@ namespace Epide
             RichTextBoxOperator.RTBoxSet(CodeBox, code);
             Unsaved = false;
             // Title = dataBox.FileName;
-
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
@@ -175,25 +176,35 @@ namespace Epide
             {
                 case Key.Tab:
                     key.Handled = true;
-                    // CodeBox.Selection.Start.
-                    // CodeBox.Selection.Text = new string(' ', dataBox.TabWidth);
-                    // CodeBox.CaretPosition = CodeBox.Selection.End;
-                    var startPosition = CodeBox.Selection.Start.GetLineStartPosition(0);
-                    var endPosition = CodeBox.Selection.End.GetLineStartPosition(0);
-                    if (!key.KeyboardDevice.IsKeyDown(Key.LeftShift))
+                    var startPosition = CodeBox.Selection.Start;
+                    var endPosition = CodeBox.Selection.End;
+                    if (startPosition.GetOffsetToPosition(endPosition) >= 1)
                     {
-                        while (startPosition?.GetOffsetToPosition(endPosition) != 0)
+                        startPosition = startPosition.GetPositionAtOffset(1); // Shrink 1 char to fix #2
+                    }
+
+                    if (!startPosition.IsAtLineStartPosition)
+                    {
+                        // MessageBox.Show("Not at start");
+                        // MessageBox.Show(new TextRange(startPosition,startPosition.GetLineStartPosition(0)).Text);
+                        startPosition = startPosition.GetLineStartPosition(0);
+                    }
+
+                    endPosition = endPosition.GetLineStartPosition(0);
+                    if (!(key.KeyboardDevice.IsKeyDown(Key.LeftShift) && key.KeyboardDevice.IsKeyDown(Key.RightShift)))
+                    {
+                        // Shift is not pressed
+                        while (startPosition?.GetOffsetToPosition(endPosition) >= 0)
                         {
+                            // MessageBox.Show(startPosition?.GetOffsetToPosition(endPosition).ToString());
                             endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
-                            endPosition = endPosition?.GetPositionAtOffset(-(2 + dataBox.TabWidth))
-                                ?.GetLineStartPosition(0);
+                            endPosition = endPosition?.GetLineStartPosition(-1);
                             // MessageBox.Show("wow");
                         }
-
-                        endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
                     }
                     else
                     {
+                        // Shift is pressed
                         while (startPosition?.GetOffsetToPosition(endPosition) != 0)
                         {
                             // endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
@@ -203,8 +214,7 @@ namespace Epide
                                 endPosition.DeleteTextInRun(dataBox.TabWidth);
                             }
 
-                            endPosition = endPosition?.GetPositionAtOffset(-(2 + dataBox.TabWidth))
-                                ?.GetLineStartPosition(0);
+                            endPosition = endPosition?.GetLineStartPosition(-1);
                             // MessageBox.Show("wow");
                         }
 
@@ -214,6 +224,7 @@ namespace Epide
                             endPosition.DeleteTextInRun(dataBox.TabWidth);
                         }
                     }
+
                     break;
                 case Key.Enter:
                     key.Handled = true;
