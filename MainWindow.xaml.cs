@@ -95,7 +95,7 @@ namespace Epide
                 $"\"{dataBox.ScriptPath}\"", "Running...");
         }
 
-        private void CodeBox_OnKeyDown(object sender, KeyEventArgs key)
+        /*private void CodeBox_OnKeyDown(object sender, KeyEventArgs key)
         {
             switch (key.Key)
             {
@@ -143,12 +143,55 @@ namespace Epide
 
                     break;
             }
-        }
+        }*/
 
         private void CodeBox_OnPreviewKeyDown(object sender, KeyEventArgs key)
         {
+            // CodeBox_OnKeyDown(sender,key);
             switch (key.Key)
             {
+                case Key.Tab:
+                    key.Handled = true;
+                    // CodeBox.Selection.Start.
+                    // CodeBox.Selection.Text = new string(' ', dataBox.TabWidth);
+                    // CodeBox.CaretPosition = CodeBox.Selection.End;
+                    var startPosition = CodeBox.Selection.Start.GetLineStartPosition(0);
+                    var endPosition = CodeBox.Selection.End.GetLineStartPosition(0);
+                    if (!key.KeyboardDevice.IsKeyDown(Key.LeftShift))
+                    {
+                        while (startPosition?.GetOffsetToPosition(endPosition) != 0)
+                        {
+                            endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
+                            endPosition = endPosition?.GetPositionAtOffset(-(2 + dataBox.TabWidth))
+                                ?.GetLineStartPosition(0);
+                            // MessageBox.Show("wow");
+                        }
+
+                        endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
+                    }
+                    else
+                    {
+                        while (startPosition?.GetOffsetToPosition(endPosition) != 0)
+                        {
+                            // endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
+                            if (new TextRange(endPosition, endPosition.GetPositionAtOffset(dataBox.TabWidth)).Text
+                                .Trim().Length == 0)
+                            {
+                                endPosition.DeleteTextInRun(dataBox.TabWidth);
+                            }
+
+                            endPosition = endPosition?.GetPositionAtOffset(-(2 + dataBox.TabWidth))
+                                ?.GetLineStartPosition(0);
+                            // MessageBox.Show("wow");
+                        }
+
+                        if (new TextRange(endPosition, endPosition.GetPositionAtOffset(dataBox.TabWidth)).Text
+                            .Trim().Length == 0)
+                        {
+                            endPosition.DeleteTextInRun(dataBox.TabWidth);
+                        }
+                    }
+                    break;
                 case Key.Enter:
                     key.Handled = true;
                     var tmpText = new TextRange(CodeBox.Selection.Start.GetLineStartPosition(0),
