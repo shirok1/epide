@@ -36,7 +36,9 @@
         <Button x:Name="ButtonRun" Click="ButtonRun_Click" Content="Run" Style="{StaticResource ButtonSuccess}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top" Width="75" Margin="0,0,5,0" />
-        <RichTextBox x:Name="CodeBox" KeyDown="CodeBox_OnKeyDown" PreviewKeyDown="CodeBox_OnPreviewKeyDown" HorizontalScrollBarVisibility="Visible" Margin="5,35,5,5" Block.LineHeight="6">
+        <RichTextBox x:Name="CodeBox"  PreviewKeyDown="CodeBox_OnPreviewKeyDown"
+                     VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible" Margin="5,35,5,5" Block.LineHeight="6">
+            <FlowDocument PageWidth="1024"/>
             <!-- <RichTextBox.BindingGroup> -->
             <!--     <BindingGroup /> -->
             <!-- </RichTextBox.BindingGroup> -->
