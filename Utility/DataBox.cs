@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using HandyControl.Controls;
@@ -29,7 +30,8 @@ namespace Epide.Utility
                 Interpreter = CustomInterpreter;
         }
 
-        [Newtonsoft.Json.JsonIgnore] public string ScriptPath { get; set; } = "untitled.py";
+        [Newtonsoft.Json.JsonIgnore] public string FilePath { get; set; } = "untitled.py";
+        [Newtonsoft.Json.JsonIgnore] public string FileName => FilePath.Split('\\').Last();
 
         [Newtonsoft.Json.JsonIgnore] public RichTextBox CodeBox { get; set; }
 

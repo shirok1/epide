@@ -17,6 +17,25 @@ namespace Epide
     {
         private readonly DataBox dataBox;
 
+        public bool Unsaved
+        {
+            get => _unsaved;
+            set
+            {
+                if (value)
+                {
+                    Title = dataBox?.FileName + " - UNSAVED";
+                }
+                else
+                {
+                    Title = dataBox?.FileName;
+                }
+                _unsaved = value;
+            }
+        }
+
+        private bool _unsaved;
+
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (DataBox.ProfileAvailability)
@@ -26,6 +45,7 @@ namespace Epide
             // dataBox.ReadProfile();
             CodeBox.FontFamily = new FontFamily(dataBox.EditorFont);
             CodeBox.FontSize = dataBox.FontSize;
+            Title = "Epide";
             // TextRange textRange = new TextRange(CodeBox.Document.ContentStart, CodeBox.Document.ContentEnd);
             // using (MemoryStream ms = new MemoryStream())
             // {
@@ -58,13 +78,15 @@ namespace Epide
                 DefaultExt = "py"
             };
             if (openFileDialog.ShowDialog() == false) return;
-            dataBox.ScriptPath = openFileDialog.FileName;
-            Title = dataBox.ScriptPath.Split('\\').Last();
-            var pyReader = new StreamReader(dataBox.ScriptPath, Encoding.UTF8);
+            dataBox.FilePath = openFileDialog.FileName;
+            var pyReader = new StreamReader(dataBox.FilePath, Encoding.UTF8);
             var code = pyReader.ReadToEnd();
             pyReader.Close();
-            // Successfully selected
+
             RichTextBoxOperator.RTBoxSet(CodeBox, code);
+            Unsaved = false;
+            // Title = dataBox.FileName;
+
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
@@ -73,7 +95,7 @@ namespace Epide
             {
                 Title = "Save this Python script file to:",
                 Filter = "Python script|*.py",
-                FileName = dataBox.ScriptPath.Split('\\').Last(),
+                FileName = dataBox.FilePath.Split('\\').Last(),
                 FilterIndex = 1,
                 RestoreDirectory = true,
                 DefaultExt = "py"
@@ -92,7 +114,7 @@ namespace Epide
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
             Executer.Execute($"\"{dataBox.Interpreter.InterpreterPath}\"",
-                $"\"{dataBox.ScriptPath}\"", "Running...");
+                $"\"{dataBox.FilePath}\"", "Running...");
         }
 
         /*private void CodeBox_OnKeyDown(object sender, KeyEventArgs key)
@@ -209,6 +231,11 @@ namespace Epide
                     CodeBox.CaretPosition = CodeBox.Selection.End;
                     break;
             }
+        }
+
+        private void CodeBox_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Unsaved = true;
         }
     }
 }
