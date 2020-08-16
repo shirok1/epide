@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -68,6 +69,27 @@ namespace Epide
             dataBox = new DataBox(CodeBox);
         }
 
+        public bool SaveFile()
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                Title = "Save this Python script file to:",
+                Filter = "Python script|*.py",
+                FileName = dataBox.FileName,
+                FilterIndex = 1,
+                RestoreDirectory = true,
+                DefaultExt = "py"
+            };
+            if (saveFileDialog.ShowDialog() == false) return false;
+            var pyWriter = new StreamWriter(saveFileDialog.FileName, false);
+            pyWriter.Write(RichTextBoxOperator.RTBoxGet(CodeBox));
+            pyWriter.Close();
+            // Title = dataBox?.FileName;
+            Unsaved = false;
+            dataBox.FilePath = saveFileDialog.FileName;
+            return true;
+        }
+
         private void ButtonOpen_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
@@ -93,19 +115,7 @@ namespace Epide
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            var saveFileDialog = new SaveFileDialog
-            {
-                Title = "Save this Python script file to:",
-                Filter = "Python script|*.py",
-                FileName = dataBox.FilePath.Split('\\').Last(),
-                FilterIndex = 1,
-                RestoreDirectory = true,
-                DefaultExt = "py"
-            };
-            if (saveFileDialog.ShowDialog() == false) return;
-            var pyWriter = new StreamWriter(saveFileDialog.FileName, false);
-            pyWriter.Write(RichTextBoxOperator.RTBoxGet(CodeBox));
-            pyWriter.Close();
+            SaveFile();
         }
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
@@ -115,6 +125,22 @@ namespace Epide
 
         private void ButtonRun_Click(object sender, RoutedEventArgs e)
         {
+            if (Unsaved)
+            {
+                switch (HandyControl.Controls.MessageBox.Show("Please save the script first.","SCRIPT UNSAVED",MessageBoxButton.OKCancel))
+                {
+                    case MessageBoxResult.OK:
+                        if (!SaveFile()) return;
+                        break;
+                    /*case MessageBoxResult.None:
+                        return;
+                    case MessageBoxResult.Cancel:
+                        return;*/
+                    default:
+                        return;
+                }
+            }
+
             Executer.Execute($"\"{dataBox.Interpreter.InterpreterPath}\"",
                 $"\"{dataBox.FilePath}\"", "Running...");
         }
@@ -199,7 +225,6 @@ namespace Epide
                             // MessageBox.Show(startPosition?.GetOffsetToPosition(endPosition).ToString());
                             endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
                             endPosition = endPosition?.GetLineStartPosition(-1);
-                            // MessageBox.Show("wow");
                         }
                     }
                     else
@@ -207,7 +232,6 @@ namespace Epide
                         // Shift is pressed
                         while (startPosition?.GetOffsetToPosition(endPosition) != 0)
                         {
-                            // endPosition?.InsertTextInRun(new string(' ', dataBox.TabWidth));
                             if (new TextRange(endPosition, endPosition.GetPositionAtOffset(dataBox.TabWidth)).Text
                                 .Trim().Length == 0)
                             {
@@ -215,7 +239,6 @@ namespace Epide
                             }
 
                             endPosition = endPosition?.GetLineStartPosition(-1);
-                            // MessageBox.Show("wow");
                         }
 
                         if (new TextRange(endPosition, endPosition.GetPositionAtOffset(dataBox.TabWidth)).Text
